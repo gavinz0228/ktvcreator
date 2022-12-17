@@ -1,0 +1,6 @@
+spleeter
+yt-dlp
+flask
+typer==0.4.1
+llvmlite==0.39.1
+gunicorn

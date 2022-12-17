@@ -1,0 +1,19 @@
+
+https://onelinerhub.com/ffmpeg/replace_audio
+ffmpeg -i input.mp4 -i input.wav -map 0:v -map 1:a -c:v copy -shortest output.mp4
+
+extra audio
+ffmpeg -i test.mp4 -c copy -map 0:a output_test.mp4
+
+remove vocal
+spleeter separate -p spleeter:2stems -o output output_test.mp4
+
+replace audio
+ffmpeg -i test.mp4 -i output_test.mp4 -map 0:v -map 1:a -c:v copy -shortest final.mp4
+
+
+netsh interface portproxy delete v4tov4 listenport=8080
+
+netsh interface portproxy set v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=8080 connectaddress=172.21.211.149
+
+ sudo docker run gavin0228/ktvcreator:1.0 -p 8080:80

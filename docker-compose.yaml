@@ -1,0 +1,10 @@
+version: "3.3"
+services:
+  airsonic:
+    image: gavin0228/ktvcreator:1.0
+    container_name: ktvcreator
+    volumes:
+      - /mnt/d/AppData/ktvcreator:/usr/src/app/working
+    ports:
+      - 8080:80
+    restart: always
