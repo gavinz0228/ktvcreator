@@ -17,5 +17,5 @@ COPY *.py ./
 ENV NUMBER_OF_WORKERS=4
 
 #CMD [ "python3", "./server.py" ]
-CMD ["sh", "-c", "python3 -m gunicorn -w ${NUMBER_OF_WORKERS:-4} -b0.0.0.0:80 server:app"]
+CMD ["sh", "-c", "python3 -m gunicorn -w ${NUMBER_OF_WORKERS} -b 0.0.0.0:80 server:app"]
 EXPOSE 80
