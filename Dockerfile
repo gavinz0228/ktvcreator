@@ -14,6 +14,8 @@ RUN apt -y install nvidia-cuda-toolkit
 
 COPY *.py ./
 
+ENV NUMBER_OF_WORKERS=4
+
 #CMD [ "python3", "./server.py" ]
-CMD ["python3", "-m", "gunicorn", "-w", "4", "-b", "0.0.0.0:80","server:app"]
+CMD ["sh", "-c", "python3 -m gunicorn -w ${NUMBER_OF_WORKERS} -b 0.0.0.0:80 server:app"]
 EXPOSE 80
