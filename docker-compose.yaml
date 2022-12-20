@@ -7,4 +7,7 @@ services:
       - /mnt/d/AppData/ktvcreator:/usr/src/app/working
     ports:
       - 8080:80
+    environment:
+      - NUMBER_OF_WORKERS=1
+      - WORKER_TIMEOUT=120
     restart: always

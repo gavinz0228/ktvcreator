@@ -1,0 +1,4 @@
+__pycache__/**
+working/**
+audio_output/**
+pretrained_models/**

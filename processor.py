@@ -9,9 +9,9 @@ import subprocess
 from spleeter.audio.adapter import AudioAdapter
 from spleeter.separator import Separator
 
-#youtube_dl_executable = path.abspath(r"youtube-dl.exe")
 ffmpeg_executable = "ffmpeg"
 ydl_executable = "yt-dlp"
+audio_sampling_rate = 44100
 
 def run_shell_get_output(command):
     return subprocess.check_output(command, shell=True, text = True)
@@ -55,14 +55,13 @@ def remove_video_vocal(video_file_path):
     
 def remove_audio_vocal(audio_file_path, output_path):
     separator = Separator('spleeter:2stems')
-    #docker audio_loader = AudioAdapter.DEFAULT
-    audio_loader = AudioAdapter.default()
-    sample_rate = 44100
-    waveform, _ = audio_loader.load(audio_file_path, sample_rate=sample_rate)
+    # have to use AudioAdapter.DEFAULT instead of AudioAdapter.default() in docker
+    audio_loader = AudioAdapter.DEFAULT
+    waveform, _ = audio_loader.load(audio_file_path, sample_rate=audio_sampling_rate)
 
     # Perform the separation :
     prediction = separator.separate(waveform)
-    audio_loader.save(output_path, prediction['accompaniment'], sample_rate)
+    audio_loader.save(output_path, prediction['accompaniment'], audio_sampling_rate)
 
 
 if __name__ == "__main__":
