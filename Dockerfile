@@ -3,6 +3,8 @@ FROM gavin0228/ktvcreator_base:1.0
 WORKDIR /usr/src/app
 
 COPY *.py ./
+RUN mkdir templates
+COPY ./templates/*.html ./templates
 
 ENV NUMBER_OF_WORKERS=1
 ENV WORKER_TIMEOUT=120

@@ -43,24 +43,39 @@ def remove_video_vocal(video_file_path):
     print("extracting audio")
     audio_with_vocal = f"{video_file_path}.audio.mp4";
     if not exists(audio_with_vocal):
-        run_shell(f"{ffmpeg_executable} -i {video_file_path} -c copy -map 0:a {audio_with_vocal}")
+        res = run_shell(f"{ffmpeg_executable} -i {video_file_path} -c copy -map 0:a {audio_with_vocal}")
+        print(res)
     print("removing vocal")
     audio_without_vocal = f"{video_file_path}.audio_no_vocal.mp4";
     if not exists(audio_without_vocal):
         remove_audio_vocal(audio_with_vocal, audio_without_vocal)
     final_output = f"{video_file_path}.final.mp4"
+    print("attaching non-vocal sound back to video")
     if not exists(final_output):
-        run_shell(f"ffmpeg -i {video_file_path} -i {audio_without_vocal} -map 0:v -map 1:a -c:v copy -shortest {final_output}")
+        res = run_shell(f"ffmpeg -i {video_file_path} -i {audio_without_vocal} -map 0:v -map 1:a -c:v copy -shortest {final_output}")
+        print(res)
     return final_output
-    
+
 def remove_audio_vocal(audio_file_path, output_path):
     separator = Separator('spleeter:2stems')
     # have to use AudioAdapter.DEFAULT instead of AudioAdapter.default() in docker
-    audio_loader = AudioAdapter.DEFAULT
+    audio_loader = None
+    if hasattr(AudioAdapter, 'DEFAULT'):
+        audio_loader = AudioAdapter.DEFAULT
+    else:
+        audio_loader = AudioAdapter.default()
+    print("loading audio with spleeter")
     waveform, _ = audio_loader.load(audio_file_path, sample_rate=audio_sampling_rate)
-
     # Perform the separation :
-    prediction = separator.separate(waveform)
+    print("performing vocal spliting", waveform)
+    prediction = None
+    try:
+        prediction = separator.separate(waveform)
+    except Exception as e:
+        print("failed to split vocal")
+        print(e)
+        return None
+    print("saving non-vocal sound")
     audio_loader.save(output_path, prediction['accompaniment'], audio_sampling_rate)
 
 
