@@ -6,6 +6,7 @@ from pathlib import Path
 app = Flask(__name__, template_folder = "templates")
 
 working_dir = path.abspath(r"./working/")
+images_dir = path.abspath(r"./images/")
 
 @app.route("/", methods=['GET'])
 def home():
@@ -26,6 +27,10 @@ def process():
 @app.route("/download/<file_name>", methods=['GET'])
 def download(file_name):
     return send_file(working_dir + "/" + file_name)
+
+@app.route("/images/<file_name>", methods=['GET'])
+def static_images(file_name):
+    return send_file(images_dir + "/" + file_name)
 
 if __name__ == '__main__':
  

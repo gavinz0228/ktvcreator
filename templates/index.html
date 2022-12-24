@@ -12,8 +12,9 @@
         </div>
     </div>
     
-    <button class="form-control btn btn-primary" onclick="process()">Process</button>
-    <div id="processing_message"> </div>
+    <button class="form-control btn btn-primary" id="btn-process" onclick="process()">Process</button>
+    <img id="loading-image" src="images/loading.gif" style="display:none;"/>
+    <div id="processing-message"> </div>
 </body>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -24,6 +25,10 @@ REQUEST_TIMEOUT = 600 * 1000;
 
 function process(){
 
+    var btnProcess = document.getElementById("btn-process");
+    var processingMsgDiv = document.getElementById("processing-message");
+    var loadingImgage = document.getElementById("loading-image");
+    
     var ytUrl = document.getElementById("ytUrl").value;
     if(!isUrlValid(ytUrl))
     {
@@ -31,16 +36,21 @@ function process(){
         return;
     }
 
-    processingMsgDiv = document.getElementById("processing_message");
-    processingMsgDiv.innerHTML = "Video is being processed in the backend";
+    loadingImgage.style = "display:block;";
+    processingMsgDiv.innerHTML = '<p>The video is currently being processed, please be patient...</p>';
+    btnProcess.disabled = true;
 
     axios.get('/process?url='+ ytUrl, {timeout: REQUEST_TIMEOUT})
         .then((response) => {
             console.log(response);
             processingMsgDiv.innerHTML = "Processing done! " + generateLinks(response.data);
+            btnProcess.disabled = false;
+            loadingImgage.style = "display:none;";
         }, (error) => {
-            alert("Backend processing timed out. Please contact the author.");
+            alert("Backend processing timed out, or error occurred. Please contact the author. " + error);
             console.log(error);
+            btnProcess.disabled = false;
+            loadingImgage.style = "display:none;";
         });
     
 }
@@ -50,10 +60,10 @@ function isUrlValid(ytUrl){
 }
 
 function generateLinks(videoId){
-    return '<a href="download/'+ videoId +'.mp4">Original Youtube Video</a> '
-        + '<a href="download/'+ videoId +'.mp4.audio.mp4">Original Youtube Audio</a> '
-        + '<a href="download/'+ videoId +'.mp4.audio_no_vocal.mp4">Vocal-removed Audio</a> '
-        + '<a href="download/'+ videoId +'.mp4.final.mp4">Vocal-removed Video</a> '
+    return '<a href="download/'+ videoId +'.mp4" target="_blank">Original Youtube Video</a> '
+        + '<a href="download/'+ videoId +'.mp4.audio.mp4" target="_blank">Original Youtube Audio</a> '
+        + '<a href="download/'+ videoId +'.mp4.audio_no_vocal.mp4" target="_blank">Vocal-removed Audio</a> '
+        + '<a href="download/'+ videoId +'.mp4.final.mp4" target="_blank">Vocal-removed Video</a> '
         + '<video width="100%" height="100%" controls> <source src="download/'+ videoId +'.mp4.final.mp4" type="video/mp4"></video>';
 }
 </script>

@@ -5,6 +5,8 @@ WORKDIR /usr/src/app
 COPY *.py ./
 RUN mkdir templates
 COPY ./templates/*.html ./templates
+RUN mkdir images
+COPY ./images/*.* ./images
 
 ENV NUMBER_OF_WORKERS=1
 ENV WORKER_TIMEOUT=120
