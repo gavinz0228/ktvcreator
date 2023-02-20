@@ -15,13 +15,19 @@
     <button class="form-control btn btn-primary" id="btn-process" onclick="process()">Process</button>
     <img id="loading-image" src="images/loading.gif" style="display:none;"/>
     <div id="processing-message"> </div>
+    <p>
+        <br/>
+        The songs have been processed will be uploaded to this Youtube Channel regularly. Please <a href="https://www.youtube.com/channel/UCuBpNcomjXpMM3Crgr_NWSA"> follow</a>
+        <br/>
+    </p>
 </body>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <script>
-REQUEST_TIMEOUT = 600 * 1000;
+REQUEST_TIMEOUT = 1200 * 1000; //20 minutes
+axios.defaults.timeout = REQUEST_TIMEOUT;
 
 function process(){
 
@@ -40,6 +46,7 @@ function process(){
     processingMsgDiv.innerHTML = '<p>The video is currently being processed, please be patient...</p>';
     btnProcess.disabled = true;
 
+    
     axios.get('/process?url='+ ytUrl, {timeout: REQUEST_TIMEOUT})
         .then((response) => {
             console.log(response);

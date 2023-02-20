@@ -8,9 +8,13 @@ COPY ./templates/*.html ./templates
 RUN mkdir images
 COPY ./images/*.* ./images
 
-ENV NUMBER_OF_WORKERS=1
+COPY requirements.txt ./
+RUN pip3 install --upgrade pip
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+ENV NUMBER_OF_WORKERS=4
 ENV WORKER_TIMEOUT=120
 
 #CMD [ "python3", "./server.py" ]
-CMD ["sh", "-c", "python3 -m gunicorn -w ${NUMBER_OF_WORKERS} -t ${WORKER_TIMEOUT} -b 0.0.0.0:80 server:app"]
+CMD ["sh", "-c", "python3 -m gunicorn -w ${NUMBER_OF_WORKERS} -t ${WORKER_TIMEOUT} -b 0.0.0.0:80 --worker-class aiohttp.worker.GunicornWebWorker server:app "]
 EXPOSE 80

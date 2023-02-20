@@ -1,39 +1,59 @@
-from flask import Flask, request, send_file, render_template
+from aiohttp import web
 from os import path
-from processor import remove_video_vocal, download_yt_video
+from processor import remove_video_vocal, download_yt_video, remove_vocal_for_youtube_url, working_dir, images_dir, templates_dir
+from processing_server import start_processing_server
+from threading import Thread
 from pathlib import Path
+import asyncio
+import logging
+import websockets
+import socket
+WEB_SOCKET_PING_TIMEOUT = 10 * 60
+WEB_SOCKET_PROCESSING_SERVER_HOST = "127.0.0.1"
+WEB_SOCKET_PROCESSING_SERVER_PORT = 60000
 
-app = Flask(__name__, template_folder = "templates")
+def is_websocket_server_running(host, port):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    return  sock.connect_ex((host, port)) == 0
 
-working_dir = path.abspath(r"./working/")
-images_dir = path.abspath(r"./images/")
+def html_response(document):
+    s = open(path.join(templates_dir, document), "r")
+    return web.Response(text=s.read(), content_type='text/html')
 
-@app.route("/", methods=['GET'])
-def home():
-    return render_template("index.html", title = 'Home')
+async def home(request):
+    return html_response("index.html")
 
-@app.route("/process", methods=['GET'])
-def process():
-    args = request.args
-    if "url" not in args:
-        return "url param is not presented in the url!"
-    yt_url = args["url"].strip()
+async def process(request):
+    if "url" not in request.rel_url.query:
+        return web.Response(text="url param is not presented in the url!")
+    yt_url = request.rel_url.query["url"].strip()
     if not yt_url:
-        return "youtube url is not presented, please paste your youtube url after ?url="
-    video_path = download_yt_video(yt_url, working_dir)
-    final_output = remove_video_vocal(video_path)
-    return Path(final_output).name.split(".")[0]
-    
-@app.route("/download/<file_name>", methods=['GET'])
-def download(file_name):
-    return send_file(working_dir + "/" + file_name)
+        return web.Response(text="youtube url is not presented, please paste your youtube url after ?url=") 
 
-@app.route("/images/<file_name>", methods=['GET'])
-def static_images(file_name):
-    return send_file(images_dir + "/" + file_name)
+    #final_output = await remove_vocal_for_youtube_url(yt_url)
+    async with websockets.connect(f'ws://{WEB_SOCKET_PROCESSING_SERVER_HOST}:{WEB_SOCKET_PROCESSING_SERVER_PORT}', ping_timeout=WEB_SOCKET_PING_TIMEOUT) as websocket:
+        await websocket.send(yt_url)
+        final_output = await websocket.recv()
+    logging.info(final_output)
+
+    return web.Response(text=Path(final_output).name.split(".")[0]) 
+    
+
+if not is_websocket_server_running(WEB_SOCKET_PROCESSING_SERVER_HOST, WEB_SOCKET_PROCESSING_SERVER_PORT):
+    logging.info("websocket processing server is not yet started, starting it right now.")
+    worker = Thread(target=start_processing_server, args=(WEB_SOCKET_PROCESSING_SERVER_HOST, WEB_SOCKET_PROCESSING_SERVER_PORT))
+    worker.start()
+else:
+    logging.info("websocket processing server is already running.")
+
+app = web.Application()
+app.add_routes([web.get('/', home),
+                web.get('/process', process),
+                web.static('/images/', images_dir),
+                web.static('/download/', working_dir)
+])
 
 if __name__ == '__main__':
- 
-    # run() method of Flask class runs the application
-    # on the local development server.
-    app.run("0.0.0.0", port=8000, debug=True)
+    logging.basicConfig(level=logging.DEBUG)
+    web.run_app(app, port=80)
+    #print(is_websocket_server_running("localhost", 60000))
