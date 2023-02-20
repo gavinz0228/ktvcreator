@@ -1,5 +1,9 @@
 # ktvcreator
-A simple web server written in python/ flask to remove vocal for youtube videos.
+A simple web server written in python to remove vocal for youtube videos.
+
+Web Framework: aiohttp
+video/Audio Processing: ffmpeg
+vocal Removing library: Spleeter
 
  
 To build the base image(with a version number):
