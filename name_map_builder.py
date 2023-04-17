@@ -5,7 +5,7 @@ from os import path
 import json
 import logging
 working_dir = path.abspath(r"./working/")
-name_map_path = path.abspath(r"./name_map.json")
+name_map_path = path.abspath(r"./working/name_map.json")
 PROCESSED_FILE_EXTENSION = ".mp4.final.mp4"
 
 def get_video_title_by_id(vid):
