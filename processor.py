@@ -18,8 +18,6 @@ audio_sampling_rate = 44100
 working_dir = path.abspath(r"./working/")
 images_dir = path.abspath(r"./images/")
 templates_dir = path.abspath(r"./templates/")
-
-
 separator = Separator('spleeter:2stems')
 
 async def run_shell_get_output(command):
