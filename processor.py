@@ -91,7 +91,12 @@ async def remove_vocal_for_youtube_url(yt_url):
     result = await remove_video_vocal(video_path)
     logging.info("finished removing vocal" + result)
     return result
-
+    
+async def remove_vocal_for_local_video(video_path):
+    result = await remove_video_vocal(video_path)
+    logging.info("finished removing vocal" + result)
+    return result
+    
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     working_dir = path.abspath(r"./working/")
