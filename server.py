@@ -46,7 +46,7 @@ async def process(request):
         final_output = await websocket.recv()
     logging.info(final_output)
     video_id = Path(final_output).name.split(".")[0]
-    video_title = add_mapping_for_video_id(video_id)
+    video_title = add_video_info(video_id)
     if video_title:
         logging.info(f'{video_id}:{video_title}')
     else:

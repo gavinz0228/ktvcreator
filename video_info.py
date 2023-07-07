@@ -34,8 +34,14 @@ def video_info_db_exists():
 def get_db():
     return rocksdb.DB(video_info_db_path, rocksdb.Options(create_if_missing=True))
 
-def add_video_info(id, title):
-    get_db().put(id, title)
+def add_video_info(id):
+    try:
+        video_title = get_video_title_by_id(id)
+        get_db().put(id.encode('utf-8'), video_title.encode('utf-8'))
+        return video_title
+    except Exception as ex:
+        logging.error(f"create_video_info_db:unable to get video title for {video_id}:" + str(ex))
+        return None
         
 def get_video_info_as_map():
     it = get_db().iteritems()
