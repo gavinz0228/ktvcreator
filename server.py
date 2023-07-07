@@ -2,7 +2,7 @@ from aiohttp import web
 from os import path
 from processor import remove_video_vocal, download_yt_video, remove_vocal_for_youtube_url, working_dir, images_dir, templates_dir
 from processing_server import start_processing_server
-from name_map_builder import * 
+from video_info import * 
 from threading import Thread
 from pathlib import Path
 
@@ -15,12 +15,16 @@ import socket
 WEB_SOCKET_PING_TIMEOUT = 10 * 60
 WEB_SOCKET_PROCESSING_SERVER_HOST = "127.0.0.1"
 WEB_SOCKET_PROCESSING_SERVER_PORT = 60000
+MAX_RECENT_FILES = 50
 
-ensure_name_map_exists()
+ensure_database_exists()
 
 def is_websocket_server_running(host, port):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    return  sock.connect_ex((host, port)) == 0
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        return  sock.connect_ex((host, port)) == 0
+    except Exception as e:
+        return False
 
 def html_response(document):
     s = open(path.join(templates_dir, document), "r")
@@ -52,18 +56,20 @@ async def process(request):
 async def recent_files(request):
     files = list(filter(path.isfile, glob(f'{working_dir}/*{PROCESSED_FILE_EXTENSION}')))
     files.sort(key=lambda x: path.getmtime(x), reverse=True)
-    name_map = get_name_map()
+    
+    video_info_map = get_video_info_as_map()
+
     i = 0
     res = []
-    max_return = 30
+
     for file_path in files:
         folder, file_name = path.split(file_path)
         video_id = file_name.replace(PROCESSED_FILE_EXTENSION ,"")
         # some videos are deleted on youtube, and it might not be in the name map
-        if video_id in name_map:
-            res.append({"videoId":video_id, "videoName":name_map[video_id]})
+        if video_id.encode('utf-8') in video_info_map:
+            res.append({"videoId":video_id, "videoName":video_info_map[video_id.encode('utf-8')].decode('utf-8')})
             i += 1
-            if i == max_return:
+            if i == MAX_RECENT_FILES:
                 break
 
     return web.json_response(res)
