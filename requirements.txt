@@ -1,6 +1,10 @@
+numpy==1.26.4
 gunicorn
 websocket
-rocksdb
+sqlitedict
 aiohttp==3.8.3
 protobuf==3.19.6
 gunicorn==20.1.0
+websockets
+yt-dlp
+spleeter

@@ -61,13 +61,13 @@ async def recent_files(request):
 
     i = 0
     res = []
-
+    logging.info(str(video_info_map))
     for file_path in files:
         folder, file_name = path.split(file_path)
         video_id = file_name.replace(PROCESSED_FILE_EXTENSION ,"")
         # some videos are deleted on youtube, and it might not be in the name map
-        if video_id.encode('utf-8') in video_info_map:
-            res.append({"videoId":video_id, "videoName":video_info_map[video_id.encode('utf-8')].decode('utf-8')})
+        if video_id in video_info_map:
+            res.append({"videoId": video_id, "videoName": video_info_map[video_id].decode('utf-8')})
             i += 1
             if i == MAX_RECENT_FILES:
                 break

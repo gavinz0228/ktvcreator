@@ -5,21 +5,21 @@ import logging
 from processor import remove_vocal_for_youtube_url
 
 
-async def handler(websocket, path):
+async def handler(websocket):
     data = await websocket.recv()
     logging.info("received: ", data)
     reply = await remove_vocal_for_youtube_url(data)
     await websocket.send(reply)
  
-def start_processing_server(host, port):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    
-    start_server = websockets.serve(handler, host, port)
+
+async def await_processing_server(host, port):
     logging.info("starting up websocket processing server: ", host, ":", port)
+    async with websockets.serve(handler, host, port):
+        await asyncio.Future()  # Run forever
     
-    asyncio.get_event_loop().run_until_complete(start_server)
-    asyncio.get_event_loop().run_forever()
+def start_processing_server(host, port):
+    asyncio.run(await_processing_server(host, port))
+
 
 if __name__ == "__main__":
-    start_processing_server("localhost", 60000)
+    asyncio.run(start_processing_server("localhost", 60000))

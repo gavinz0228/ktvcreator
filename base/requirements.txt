@@ -1,4 +1,3 @@
 spleeter
-yt-dlp
 typer==0.4.1
 llvmlite==0.39.1
