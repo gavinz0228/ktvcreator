@@ -1,99 +1,367 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title> Youtube KTV</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>KTV Creator</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-<style>
-#recentList li {
-    padding: 5px 5px 5px 5px;
-}
-</style>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .page-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #e94560, #0f3460, #53d8fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            color: #8892a4;
+            font-size: 1rem;
+        }
+
+        .card-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-panel .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #53d8fb;
+            margin-bottom: 16px;
+        }
+
+        .form-control, .form-control:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e0e0e0;
+            border-radius: 10px;
+        }
+
+        .form-control:focus {
+            border-color: #53d8fb;
+            box-shadow: 0 0 0 3px rgba(83, 216, 251, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: #5a6478;
+        }
+
+        input[type="file"].form-control {
+            padding: 10px;
+        }
+
+        .btn-process {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-youtube {
+            background: linear-gradient(135deg, #e94560, #c0392b);
+            border: none;
+            color: #fff;
+        }
+
+        .btn-youtube:hover:not(:disabled) {
+            background: linear-gradient(135deg, #ff5f7e, #e94560);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, #53d8fb, #0f3460);
+            border: none;
+            color: #fff;
+        }
+
+        .btn-upload:hover:not(:disabled) {
+            background: linear-gradient(135deg, #7ee8ff, #1a5276);
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(83, 216, 251, 0.35);
+        }
+
+        .btn-process:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-box {
+            margin-top: 14px;
+            min-height: 24px;
+            font-size: 0.9rem;
+        }
+
+        .status-box .spinner-border {
+            width: 1.2rem;
+            height: 1.2rem;
+            border-width: 2px;
+            vertical-align: middle;
+            margin-right: 8px;
+            color: #53d8fb;
+        }
+
+        .status-box a {
+            color: #53d8fb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .status-box a:hover {
+            text-decoration: underline;
+        }
+
+        .result-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .result-links a {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            background: rgba(83, 216, 251, 0.12);
+            border: 1px solid rgba(83, 216, 251, 0.3);
+            color: #53d8fb !important;
+            text-decoration: none !important;
+            transition: background 0.15s;
+        }
+
+        .result-links a:hover {
+            background: rgba(83, 216, 251, 0.25);
+            text-decoration: none !important;
+        }
+
+        .divider {
+            border-color: rgba(255,255,255,0.08);
+            margin: 8px 0 24px;
+        }
+
+        .recent-section .section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #53d8fb;
+            margin-bottom: 14px;
+        }
+
+        #recentList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #recentList li {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.15s;
+        }
+
+        #recentList li:last-child {
+            border-bottom: none;
+        }
+
+        #recentList li:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        #recentList a {
+            color: #c9d1e0;
+            text-decoration: none;
+            font-size: 0.92rem;
+        }
+
+        #recentList a:hover {
+            color: #53d8fb;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #5a6478;
+            font-size: 0.82rem;
+            margin-top: 32px;
+        }
+
+        .footer-note a {
+            color: #e94560;
+        }
+
+        video {
+            border-radius: 12px;
+            margin-top: 12px;
+        }
+    </style>
 </head>
-<body class="container">
-    <h1 class="mb-3 row">KTV Creator</h1>
-    <div class="mb-3 row">
-        <label for="ytUrl" class="col-sm-2 col-form-label">Youtube Url</label>
-        <div class="col-sm-10">
-            <input type="text" id="ytUrl" class="form-control" placeholder="Paste your youtube url here." size ="100"/> 
-        </div>
+<body>
+<div class="page-wrapper">
+
+    <div class="hero">
+        <h1>KTV Creator</h1>
+        <p>Remove vocals from YouTube videos or your own MP3 files</p>
     </div>
-    
-    <button class="form-control btn btn-primary" id="btn-process" onclick="process()">Process</button>
-    <img id="loading-image" src="images/loading.gif" style="display:none;"/>
-    <div id="processing-message"> </div>
-    <p>
-        <br/>
-        The songs have been processed will be uploaded to this Youtube Channel regularly. Please <a href="https://www.youtube.com/channel/UCuBpNcomjXpMM3Crgr_NWSA"> follow</a>
-        <br/>
-    </p>
-    <p>Recent Files:</p>
-    <ul id="recentList">
-    </ul>
-</body>
+
+    <!-- YouTube Section -->
+    <div class="card-panel">
+        <div class="section-title">YouTube URL</div>
+        <input type="text" id="ytUrl" class="form-control" placeholder="Paste a YouTube URL here..."/>
+        <button class="btn btn-process btn-youtube" id="btn-process" onclick="process()">Process YouTube Video</button>
+        <div class="status-box" id="processing-message"></div>
+    </div>
+
+    <!-- MP3 Upload Section -->
+    <div class="card-panel">
+        <div class="section-title">Upload MP3</div>
+        <input type="file" id="mp3File" class="form-control" accept=".mp3,audio/mpeg"/>
+        <button class="btn btn-process btn-upload" id="btn-upload" onclick="uploadMp3()">Upload &amp; Remove Vocal</button>
+        <div class="status-box" id="upload-message"></div>
+    </div>
+
+    <!-- Recent Files -->
+    <div class="card-panel recent-section">
+        <div class="section-title">Recent Files</div>
+        <ul id="recentList">
+            <li style="color:#5a6478; font-size:0.88rem;">Loading...</li>
+        </ul>
+    </div>
+
+    <div class="footer-note">
+        Processed songs are uploaded to our <a href="https://www.youtube.com/channel/UCuBpNcomjXpMM3Crgr_NWSA" target="_blank">YouTube channel</a> regularly.
+    </div>
+
+</div>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
 <script>
-REQUEST_TIMEOUT = 1200 * 1000; //20 minutes
+const REQUEST_TIMEOUT = 1200 * 1000;
 axios.defaults.timeout = REQUEST_TIMEOUT;
 
-axios.get('/recent_files', {timeout: REQUEST_TIMEOUT})
-        .then((response) => {
-            console.log(response);
-            var ulList = document.getElementById('recentList')
-            for(var i = 0; i < response.data.length; i++)
-            {
-                ulList.innerHTML+= '<li><a href="download/'+ response.data[i]["videoId"]  + '.mp4.final.mp4">' + response.data[i]["videoName"] + '</a></li>'
-            }
-        }, (error) =>
-        {
-            console.log(error);
-        });
+// Load recent files
+axios.get('/recent_files').then((response) => {
+    var ulList = document.getElementById('recentList');
+    if (response.data.length === 0) {
+        ulList.innerHTML = '<li style="color:#5a6478;font-size:0.88rem;">No processed files yet.</li>';
+        return;
+    }
+    ulList.innerHTML = '';
+    for (var i = 0; i < response.data.length; i++) {
+        ulList.innerHTML += '<li><a href="download/' + response.data[i]["videoId"] + '.mp4.final.mp4" target="_blank">'
+            + response.data[i]["videoName"] + '</a></li>';
+    }
+}, (error) => { console.log(error); });
 
-function process(){
+function setStatus(elemId, html) {
+    document.getElementById(elemId).innerHTML = html;
+}
 
+function spinnerHtml(msg) {
+    return '<span class="spinner-border"></span>' + msg;
+}
+
+function process() {
     var btnProcess = document.getElementById("btn-process");
-    var processingMsgDiv = document.getElementById("processing-message");
-    var loadingImgage = document.getElementById("loading-image");
-    
-    var ytUrl = document.getElementById("ytUrl").value;
-    if(!isUrlValid(ytUrl))
-    {
-        alert("Please paste/ type in a valid youtube video link!");
+    var ytUrl = document.getElementById("ytUrl").value.trim();
+    if (!isUrlValid(ytUrl)) {
+        alert("Please paste a valid YouTube video link.");
         return;
     }
 
-    loadingImgage.style = "display:block;";
-    processingMsgDiv.innerHTML = '<p>The video is currently being processed, please be patient...</p>';
+    setStatus('processing-message', spinnerHtml('Processing video, please wait...'));
     btnProcess.disabled = true;
 
-    
-    axios.get('/process?url='+ ytUrl, {timeout: REQUEST_TIMEOUT})
-        .then((response) => {
-            console.log(response);
-            processingMsgDiv.innerHTML = "Processing done! " + generateLinks(response.data);
-            btnProcess.disabled = false;
-            loadingImgage.style = "display:none;";
-        }, (error) => {
-            alert("Backend processing timed out, or error occurred. Please contact the author. " + error);
-            console.log(error);
-            btnProcess.disabled = false;
-            loadingImgage.style = "display:none;";
-        });
-    
+    axios.get('/process?url=' + encodeURIComponent(ytUrl)).then((response) => {
+        setStatus('processing-message', 'Done! ' + generateLinks(response.data));
+        btnProcess.disabled = false;
+    }, (error) => {
+        alert("Processing failed or timed out. " + error);
+        setStatus('processing-message', '');
+        btnProcess.disabled = false;
+    });
 }
 
-function isUrlValid(ytUrl){
-    return ytUrl.trim() != "" && ytUrl.startsWith('https://', 0) || ytUrl.length >= 20;
+function uploadMp3() {
+    var fileInput = document.getElementById("mp3File");
+    var btnUpload = document.getElementById("btn-upload");
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Please select an MP3 file.");
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    setStatus('upload-message', spinnerHtml('Uploading and processing, please wait...'));
+    btnUpload.disabled = true;
+
+    axios.post('/upload_mp3', formData, {
+        timeout: REQUEST_TIMEOUT,
+        headers: { 'Content-Type': 'multipart/form-data' }
+    }).then((response) => {
+        var filename = response.data;
+        setStatus('upload-message',
+            'Done! <div class="result-links"><a href="download/' + filename + '.audio_no_vocal.mp4" target="_blank">Vocal-removed Audio</a></div>');
+        btnUpload.disabled = false;
+    }, (error) => {
+        alert("Upload or processing failed. " + error);
+        setStatus('upload-message', '');
+        btnUpload.disabled = false;
+    });
 }
 
-function generateLinks(videoId){
-    return '<a href="download/'+ videoId +'.mp4" target="_blank">Original Youtube Video</a> '
-        + '<a href="download/'+ videoId +'.mp4.audio.mp4" target="_blank">Original Youtube Audio</a> '
-        + '<a href="download/'+ videoId +'.mp4.audio_no_vocal.mp4" target="_blank">Vocal-removed Audio</a> '
-        + '<a href="download/'+ videoId +'.mp4.final.mp4" target="_blank">Vocal-removed Video</a> '
-        + '<video width="100%" height="100%" controls> <source src="download/'+ videoId +'.mp4.final.mp4" type="video/mp4"></video>';
+function isUrlValid(ytUrl) {
+    return ytUrl !== "" && (ytUrl.startsWith('https://') || ytUrl.length >= 20);
+}
+
+function generateLinks(videoId) {
+    return '<div class="result-links">'
+        + '<a href="download/' + videoId + '.mp4" target="_blank">Original Video</a>'
+        + '<a href="download/' + videoId + '.mp4.audio.mp4" target="_blank">Original Audio</a>'
+        + '<a href="download/' + videoId + '.mp4.audio_no_vocal.mp4" target="_blank">Vocal-removed Audio</a>'
+        + '<a href="download/' + videoId + '.mp4.final.mp4" target="_blank">Vocal-removed Video</a>'
+        + '</div>'
+        + '<video width="100%" controls><source src="download/' + videoId + '.mp4.final.mp4" type="video/mp4"></video>';
 }
 </script>
+</body>
 </html>
