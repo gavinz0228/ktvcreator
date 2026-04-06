@@ -1,6 +1,6 @@
 from aiohttp import web
 from os import path
-from processor import remove_video_vocal, download_yt_video, remove_vocal_for_youtube_url, working_dir, images_dir, templates_dir
+from processor import remove_video_vocal, download_yt_video, remove_vocal_for_youtube_url, remove_audio_vocal, working_dir, images_dir, templates_dir
 from processing_server import start_processing_server
 from video_info import * 
 from threading import Thread
@@ -53,6 +53,27 @@ async def process(request):
         logging.error(f'Failed to get video title for video_id:{video_id}')
     return web.Response(text=video_id) 
 
+async def upload_mp3(request):
+    reader = await request.multipart()
+    field = await reader.next()
+    if field is None or field.name != 'file':
+        return web.Response(status=400, text="No file field in upload")
+
+    filename = path.basename(field.filename)
+    save_path = path.join(working_dir, filename)
+    with open(save_path, 'wb') as f:
+        while True:
+            chunk = await field.read_chunk()
+            if not chunk:
+                break
+            f.write(chunk)
+
+    output_path = f"{save_path}.audio_no_vocal.mp4"
+    loop = asyncio.get_event_loop()
+    await loop.run_in_executor(None, remove_audio_vocal, save_path, output_path)
+
+    return web.Response(text=filename)
+
 async def recent_files(request):
     files = list(filter(path.isfile, glob(f'{working_dir}/*{PROCESSED_FILE_EXTENSION}')))
     files.sort(key=lambda x: path.getmtime(x), reverse=True)
@@ -83,10 +104,11 @@ else:
     logging.info("websocket processing server is already running.")
 
 
-app = web.Application()
+app = web.Application(client_max_size=256 * 1024 * 1024)  # 256MB upload limit
 app.add_routes([web.get('/', home),
                 web.get('/process', process),
                 web.get('/recent_files', recent_files),
+                web.post('/upload_mp3', upload_mp3),
                 web.static('/images/', images_dir),
                 web.static('/download/', working_dir)
 ])
