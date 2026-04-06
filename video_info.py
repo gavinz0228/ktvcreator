@@ -60,7 +60,11 @@ def add_video_info(id):
 def get_video_info_as_map():
     result = {}
     for key, value in get_db().items():
-        result[key.decode("utf-8")] = value["title"].decode("utf-8")
+        if isinstance(key, bytes):
+            key = key.decode("utf-8")
+        if isinstance(value["title"], bytes):
+            value = value["title"].decode("utf-8")
+        result[key] = value
     return result
 
 def ensure_database_exists():
