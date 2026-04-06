@@ -13,7 +13,7 @@ async def handler(websocket):
  
 
 async def await_processing_server(host, port):
-    logging.info("starting up websocket processing server: ", host, ":", port)
+    #logging.info("starting up websocket processing server: ", host, ":", port)
     async with websockets.serve(handler, host, port):
         await asyncio.Future()  # Run forever
     

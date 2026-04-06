@@ -1,6 +1,6 @@
 services:
   ktvcreator:
-    image: gavin0228/ktvcreator:1.0
+    image: gavin0228/ktvcreator:1.1
     container_name: ktvcreator
     volumes:
       - /mnt/disk2/share:/usr/src/app/working

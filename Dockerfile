@@ -32,7 +32,7 @@ COPY ./images/*.* ./images
 ENV NUMBER_OF_WORKERS=4
 ENV WORKER_TIMEOUT=240
 
-
+RUN python3.10 -m pip install --upgrade yt-dlp
 
 #CMD [ "python3", "./server.py" ]
 CMD ["sh", "-c", "python3.10 -m gunicorn -w ${NUMBER_OF_WORKERS} -t ${WORKER_TIMEOUT} -b 0.0.0.0:80 --worker-class aiohttp.worker.GunicornWebWorker server:app "]
